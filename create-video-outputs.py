@@ -24,7 +24,7 @@ sample = False
 def main():
 	global sample
 	try:
-		opts, args = getopt.getopt(sys.argv[1:],"h:i:s:",["help","input","sample"])
+		opts, args = getopt.getopt(sys.argv[1:],"hi:s",["help","input=","sample"])
 		if len(opts) == 0:
 			print('No Input provided')
 			__usage(2)
@@ -37,7 +37,7 @@ def main():
 		elif opt in ("-i", "--input"):
 			input = arg
 		elif opt in ("-s", "--sample"):
-			sample = arg.lower() == 'true'
+			sample = True
 	
 	__loadVideoInput(input)
 	__runTranscode()
@@ -141,7 +141,9 @@ def __uhdFFMPEGcmd():
 def __usage(exit_code):
 	script = os.path.basename(__file__)
 	print('Correct Usage:')
-	print (script, '-i[--input] <inputfile> -s[--sample] <true/false>(optional)')
+	print (script, '-h[--help]  Show this help')
+	print (script, '-i[--input] <inputfile> -s[--sample] (optional)')
+	print ('NB sample time is a setting in config.ini')
 	exit(exit_code)
 if __name__ == "__main__":
     main()
