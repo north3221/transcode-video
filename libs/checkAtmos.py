@@ -2,13 +2,13 @@ import subprocess
 
 class AtmosInfo:
 
-	def __init__(self, playlist):
+	def __init__(self, mediainfo_input):
 		print('Checking for Dolby Atmos audio....')
-		self.__setAtmos(playlist)
+		self.__setAtmos(mediainfo_input)
 			
-	def __setAtmos(self, playlist):
+	def __setAtmos(self, mi):
 		delim = '/'
-		cmdMediaIffo = 'mediainfo --Inform="Audio;%Format_Commercial_IfAny%' + delim + '" ' + playlist
+		cmdMediaIffo = 'mediainfo --Inform="Audio;%Format_Commercial_IfAny%' + delim + '" ' + mi
 		try:
 			output = subprocess.check_output(cmdMediaIffo, stderr=subprocess.STDOUT)
 		except Exception as e:			

@@ -1,5 +1,6 @@
-import sys, getopt, libs.fileInfo as fi
+import sys, getopt, shutil, libs.fileInfo as fi
 from libs.videoInput import videoInput as vinput
+from os import path
 
 import configparser
 import subprocess, os
@@ -18,6 +19,7 @@ for section in config.sections():
 			if val.lower() in ('true', 'false'): exec('opts["' + key + '"] = ' + val.title())
 output_path = fi.checkDir(opts['output_path'])
 log_path = fi.checkDir(opts['log_path'])
+temp_path = fi.checkDir(opts['temp_path'])
 ############# END CONFIG ########################
 videoInput = None
 sample = False
@@ -47,6 +49,12 @@ def __loadVideoInput(inputfile):
 	videoInput = vinput(inputfile)
 	
 def __runTranscode():
+	# Idealy find a way to pass StingIO file direct to ffmpeg...? but for now
+	global metadata 
+	metadata = path.join(temp_path, videoInput.title + '.met')
+	print(metadata)
+	with open(metadata, 'w') as met:
+		print(videoInput.info.chapters.read(), file=met)
 	cmd = __createFFMPEGcmd()
 	with open(log_path + videoInput.ofilename + '.cmd.log', "w") as log_file:
 		print (cmd, file=log_file)
@@ -54,6 +62,7 @@ def __runTranscode():
 	with open(log_path + videoInput.ofilename + '.transcode.log', 'w') as log_file:
 		subprocess.call(cmd, stderr=subprocess.STDOUT, stdout=log_file)
 	print('Process complete')
+	shutil.rmtree(temp_path)
 
 def __createFFMPEGcmd():
 	cmd = []
@@ -70,7 +79,8 @@ def __baseFFMPEGcmd():
 	cmd.append('-analyzeduration ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
 	if sample: cmd.append(opts['sample_time'])
-	cmd.append('-i ' + videoInput.input + ' -map_metadata 0')
+	cmd.append('-i ' + videoInput.input)
+	cmd.append('-i "' + metadata + '" -map_metadata 1')
 	
 	return ' '.join(cmd)
 

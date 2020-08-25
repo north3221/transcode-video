@@ -1,4 +1,4 @@
-import subprocess, datetime
+import subprocess, datetime, os
 import os.path as osp
 from libs import inputManager as im
 from libs.videoInfo import videoInfo as vi
@@ -20,19 +20,23 @@ class videoInput:
 				
 		if self.__isBlurayFolder(input):
 			self.type = im.inputType.blurayBackup
-			self.path = im.checkDir(osp.abspath(input))
 			self.folder = osp.basename(input)
-			self.__setTitle()
 			self.__setPlaylist()
+		elif osp.isfile(input):
+			self.type = im.inputType.videoFile
+			self.folder = osp.basename(osp.abspath((osp.join(input, os.pardir, os.pardir,os.pardir))))
 		else:
 			print('You dont seem to have provided an bluray folder path, please check (', input , ')')
 			exit(2)
 		
+		self.path = im.checkDir(osp.abspath(input))
+		
+		self.__setTitle()
 		self.input = im.getFfmpegInput(self.type, self.path)
 		self.info = vi(self.input)
 		self.uhd = self.info.height == '2160'
 		self.hdr = hdr(self.info)
-		self.atmos = atmos(self.playlistpath)
+		self.atmos = atmos(self.path)
 		self.__userCheck()
 	
 	@property
@@ -48,7 +52,7 @@ class videoInput:
 		return self.__title + '(' + str(self.year) + ')'
 	
 	def __setTitle(self):
-		self.title = self.folder.replace("_"," ").title()
+		self.title = self.folder.replace("_"," ").title()				
 			
 	def __isBlurayFolder(self, path):
 		return osp.exists(path + "\BDMV\index.bdmv")
@@ -76,14 +80,22 @@ class videoInput:
 		print(indent,'Video Stream:=', indent, self.info.vstream)
 		print(indent,'Audio Stream:=', indent, self.info.astream)
 		print(indent,'UHD:=', indent, indent, indent,self.uhd)
-		print(indent,'HDR:=', indent, indent, indent,self.hdr.exists)
-		print(indent,'Atmos:=', indent, indent,self.atmos.exists)
+		print(indent,'HDR:=', indent, indent, indent,self.hdr.exists, '(NB Cannot be changed)')
+		print(indent,'Atmos:=', indent, indent,self.atmos.exists, '(NB Cannot be changed)')
 		print (boarder)
 		user_input = input('If you would like to change any of the above, type anything and will step through, if happy just hit enter\n')
 		if not user_input == '':
 			input_title = input('Input Title or hit enter to leave as "' + self.title + '"\n')
 			if not input_title == '': self.title = input_title
 			self.__inputYear()
+			input_vs = input('Input Video Stream or hit enter to leave as "' + self.info.vstream + '"\n')
+			if not input_vs == '': self.info.vstream = input_vs
+			input_as = input('Input Audio Stream or hit enter to leave as "' + self.info.astream + '"\n')
+			if not input_as == '': self.info.astream =input_as
+			input_uhd = input('Input UHD or hit enter to leave as "' + str(self.uhd) + '"\n')
+			if input_uhd.lower() in ['true', 'false']: self.uhd = input_uhd.lower() == 'true'
+			print(os.name)
+			os.system('cls') if os.name == 'nt' else os.system('clear')
 			boarder = '******************************************************'
 			print (boarder)
 			print('Updated based on your inputs, now set to:')
