@@ -1,10 +1,6 @@
-import sys, getopt, shutil, libs.fileInfo as fi
+import sys, getopt, shutil, libs.fileInfo as fi, configparser, os
 from libs.videoInput import videoInput as vinput
 from os import path
-
-import configparser
-import subprocess, os
-
 ############### CONFIG ##########################
 config = configparser.ConfigParser()
 config.read('config.ini')

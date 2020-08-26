@@ -68,7 +68,7 @@ class videoInput:
 			if "selected" in line:
 				splitline = line.split()
 				self.playlist = splitline[splitline.index("selected") + 1]
-		if osp.isfile(self.path + '\BDMV\PLAYLIST\\' + self.playlist): self.playlistpath = self.path + '\BDMV\PLAYLIST\\' + self.playlist
+				if osp.isfile(self.path + '\BDMV\PLAYLIST\\' + self.playlist): self.playlistpath = self.path + '\BDMV\PLAYLIST\\' + self.playlist
 		
 	def __userCheck(self):
 		indent = '\t'

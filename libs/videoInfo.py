@@ -26,11 +26,9 @@ class videoInfo:
 		ffprobe_cmd = 'ffprobe -v quiet -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' + input
 		try:
 			self.duration = subprocess.check_output(ffprobe_cmd, stderr=subprocess.STDOUT)
-			self.duration = int(float(self.duration.decode("utf-8").strip()))
-			
+			self.duration = float(self.duration.decode("utf-8").split('\n')[0])		
 		except:
-			print('Issue getting durationn - will likely crash')
-			
+			print('Issue getting durationn - will likely crash')		
 	
 	def __chapters(self):
 		chapter_size = 300

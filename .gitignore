@@ -6,6 +6,7 @@ __pycache__/
 # Folders to ignore
 logs/
 output/
+backup/
 
 # C extensions
 *.so
