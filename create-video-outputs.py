@@ -78,14 +78,15 @@ def __baseFFMPEGcmd():
 	cmd.append('-probesize ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-analyzeduration ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
+	# Seems to be an issue having metadata as second input, seeems to only work on first?
+	cmd.append('-i "' + metadata + '"')
 	if sample: cmd.append(opts['sample_time'])
 	cmd.append('-i ' + videoInput.input)
-	cmd.append('-i "' + metadata + '" -map_metadata 1')
 	
 	return ' '.join(cmd)
 
 def __hdFFMPEGcmd():
-	cmd = ['-map 0:' + videoInput.info.vstream]
+	cmd = ['-map_metadata 0 -map 1:' + videoInput.info.vstream]
 	if videoInput.hdr.exists: cmd.append(videoInput.hdr.sdrmap)
 	cmd.append('-c:v ' + opts['hd_codec'])
 	if not opts['x264_level'] == '': cmd.append('-level:v ' +  str(opts['x264_level'])) 
@@ -101,14 +102,14 @@ def __hdFFMPEGcmd():
 	aos = '0'
 	if opts['add_stereo']:
 		if opts['stereo_primary']:
-			cmd.append('-filter_complex "[0:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
+			cmd.append('-filter_complex "[1:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
 			aos = '1'
 		else:
-			cmd.append('-map 0:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+			cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
 			aos = '1'
-			cmd.append('-filter_complex "[0:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
+			cmd.append('-filter_complex "[1:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
 	else:
-		cmd.append('-map 0:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+		cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
 	cmd.append('-metadata:s:a language=eng')
 	cmd.append('-metadata title="' + videoInput.title + '" -metadata date="' + str(videoInput.year) + '"')
 	
@@ -119,7 +120,7 @@ def __hdFFMPEGcmd():
 	return ' '.join(cmd)
 
 def __uhdFFMPEGcmd():
-	cmd = ['-map 0:' + videoInput.info.vstream + ' -c:v libx265']
+	cmd = ['-map_metadata 0 -map 1:' + videoInput.info.vstream + ' -c:v libx265']
 	cmd.append('-preset ' +  opts['uhd_preset'])
 	if not opts['uhd_pix_fmt'] == '': videoInput.info.pix_fmt = opts['uhd_pix_fmt']
 	cmd.append('-pix_fmt ' + videoInput.info.pix_fmt + ' -x265-params')
@@ -127,15 +128,15 @@ def __uhdFFMPEGcmd():
 	if not opts['uhd_maxrate'] == '' :
 		params = params + ':vbv-maxrate=' + str(opts['uhd_maxrate'])
 		params = params + ':vbv-bufsize=' + str(opts['uhd_maxrate']*3)
-	if videoInput.hdr.exists: params = params + videoInput.hdr.params
+	if videoInput.hdr.exists: params = params + ':' + videoInput.hdr.params
 	cmd.append(params)
 	aos = '0'
 	if videoInput.atmos.exists:
-		cmd.append('-map 0:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['uhd_acodec'] + ' -b:a:' + aos + ' 640k') 
+		cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['uhd_acodec'] + ' -b:a:' + aos + ' 640k') 
 		cmd.append('-metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
 		aos = '1'
 	# copy audio, either its not atmos and just a straight copy to be the audio stream or it is Atmos so this is copying atmos to second stream
-	cmd.append('-map 0:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
+	cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
 	if videoInput.atmos.exists: cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
 	cmd.append('-metadata:s:a language=eng')
 	cmd.append('-metadata title="' + videoInput.title + '" -metadata year="' + str(videoInput.year) + '"')

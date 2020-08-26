@@ -33,17 +33,17 @@ class videoInfo:
 			
 	
 	def __chapters(self):
-		chapter_size = 300 * int(self.time_base.split('/')[1])
+		chapter_size = 300
 		start = 0
 		cid = 1
 		chapters = [';FFMETADATA1']
 		while start < self.duration:
 			chapters.append('[CHAPTER]')
 			chapters.append('TIMEBASE=' + self.time_base)
-			chapters.append('START=' + str(start))
+			chapters.append('START=' + str(start * int(self.time_base.split('/')[1])))
 			end = start + chapter_size
 			if end > self.duration: end = self.duration
-			chapters.append('END=' + str(end))
+			chapters.append('END=' + str(end  * int(self.time_base.split('/')[1])))
 			chapters.append('title=Chapter ' + str(cid))
 			start = end
 			cid = cid + 1

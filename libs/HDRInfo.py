@@ -11,7 +11,7 @@ class HDRInfo:
 			
 			
 	def __setparams(self, info):
-		self.params = 'hdr-opt=1:repeat-headers=1:colorprim=' + info.color_primaries
+		self.params = 'hdr10-opt=1:repeat-headers=1:colorprim=' + info.color_primaries
 		self.params = self.params + ':transfer=' + info.color_transfer + ':colormatrix=' + info.color_space + ':master-display='
 		self.params = self.params + 'G(' + info.green_x.split('/')[0] + ',' + info.green_y.split('/')[0] + ')'
 		self.params = self.params + 'B(' + info.blue_x.split('/')[0] + ',' + info.blue_y.split('/')[0] + ')'
