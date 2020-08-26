@@ -23,14 +23,14 @@ if is_admin():
 			disk = line.split(',')[0].split(':')[1]
 			title = line.split(',')[5].strip('"')
 			drive = line.split(',')[6]
-			
+	
+	# TODO likely going to cause an issue if any spaces in path or title
 	backup = os.path.join(backup_path, title)
 	log = os.path.join(log_path, 'makemkv-' + title +'.log')
 	bcmd = 'makemkvcon backup --decrypt --cache=256 -r --progress=-same disc:' + disk + ' ' + backup
 	print('Running backup of', title, 'to', backup)
 	with open(log, 'w') as log_file:
-		#subprocess.call(bcmd, stderr=subprocess.STDOUT, stdout=log_file)
-		pass
+		subprocess.call(bcmd, stderr=subprocess.STDOUT, stdout=log_file)
 		
 	transcode = 'python ' + os.path.join(os.path.dirname(os.path.abspath(__file__)), 'create-video-outputs.py -i ' + os.path.abspath(backup))
 	if call_transcode: os.system(transcode)
