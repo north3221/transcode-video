@@ -38,7 +38,7 @@ It gets info and overwrites title and year on the info. Don't forget the pre-req
 
 
 #### Window drag and drop:
-There are two dragand drop (dnd) files. These are so you can drag and drop your video file or bluray folder for full transcode or sample:
+There are two drag and drop (dnd) files. These are so you can drag and drop your video file or bluray folder for full transcode or sample:
 *	dnd-video-transcode.bat
 *	dnd-video-transcode-sample.bat
 There is also a bat for running decrypt by double clicking
