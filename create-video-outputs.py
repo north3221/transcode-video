@@ -1,4 +1,4 @@
-import sys, getopt, shutil, libs.fileInfo as fi, configparser, os
+import sys, getopt, shutil, libs.fileInfo as fi, configparser, os, subprocess
 from libs.videoInput import videoInput as vinput
 from os import path
 ############### CONFIG ##########################
@@ -58,7 +58,7 @@ def __runTranscode():
 	with open(log_path + videoInput.ofilename + '.transcode.log', 'w') as log_file:
 		subprocess.call(cmd, stderr=subprocess.STDOUT, stdout=log_file)
 	print('Process complete')
-	shutil.rmtree(temp_path)
+	#shutil.rmtree(temp_path)
 
 def __createFFMPEGcmd():
 	cmd = []
