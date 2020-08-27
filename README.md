@@ -11,7 +11,7 @@ This comes with the option to pass the backed-up bluray directly to the transcod
 You can also choose to bypass the user check of movie info (so you can overwrite title, year etc), so it can just do the lot in one go.
 If doing that I suggest using the MovieDB option and setting a api-key so it tries to get the right title and year.
 
-There are win bat files in the windows folder, so if you set movie db, and no user check you can put a bluray in and just double click *run-bluray-decrypt.bat
+There are win bat files in the windows folder, so if you set movie db, and no user check you can put a bluray in and just double click:	`run-bluray-decrypt.bat`
 
 
 ### prerequisites
@@ -43,7 +43,7 @@ This holds the settings
 This is the python script that transcodes the video
 
 #### usage:
-	create-video-outputs.py -i[--input] <inputfile> -s[--sample] (optional)
+	`create-video-outputs.py -i[--input] <inputfile> -s[--sample] (optional)`
 	NB sample time is a setting in config.ini
 	
 ### decrypt-bluray.py
@@ -57,11 +57,11 @@ It gets info and overwrites title and year on the info. Don't forget the pre-req
 
 #### Window drag and drop:
 There are two drag and drop (dnd) files. These are so you can drag and drop your video file or bluray folder for full transcode or sample:
-*	dnd-video-transcode.bat
-*	dnd-video-transcode-sample.bat
+*	`dnd-video-transcode.bat`	
+*	`dnd-video-transcode-sample.bat`
 There is also a bat for running decrypt by double clicking
 So if set the call transcode to true, calling Movie DB and set check user to false can double click and it will run the lot
-*	run-bluray-decrypt.bat
+*	`run-bluray-decrypt.bat`
 
 
 
