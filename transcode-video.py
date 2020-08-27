@@ -1,9 +1,10 @@
-import sys, getopt, shutil, libs.fileInfo as fi, configparser, os, subprocess
+import sys, getopt, shutil, configparser, os, subprocess 
+from libs import fileInfo as fi
 from libs.videoInput import videoInput as vinput
 from os import path
 ############### CONFIG ##########################
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('config/config.ini')
 opts = {}
 for section in config.sections():
 	for key, val in config.items(section):
@@ -48,7 +49,6 @@ def __runTranscode():
 	# Idealy find a way to pass StingIO file direct to ffmpeg...? but for now
 	global metadata 
 	metadata = path.join(temp_path, videoInput.title + '.met')
-	print(metadata)
 	with open(metadata, 'w') as met:
 		print(videoInput.info.chapters.read(), file=met)
 	cmd = __createFFMPEGcmd()
@@ -58,7 +58,7 @@ def __runTranscode():
 	with open(log_path + videoInput.ofilename + '.transcode.log', 'w') as log_file:
 		subprocess.call(cmd, stderr=subprocess.STDOUT, stdout=log_file)
 	print('Process complete')
-	#shutil.rmtree(temp_path)
+	shutil.rmtree(temp_path)
 
 def __createFFMPEGcmd():
 	cmd = []

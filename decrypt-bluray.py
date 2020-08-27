@@ -1,6 +1,5 @@
 import ctypes, sys, subprocess, configparser, os, time
 
-
 def is_admin():
 	try:
 		return ctypes.windll.shell32.IsUserAnAdmin()
@@ -10,7 +9,7 @@ def is_admin():
 if is_admin():
 	print('Checking for disk info')
 	config = configparser.ConfigParser()
-	config.read('config.ini')
+	config.read('config/config.ini')
 	backup_path = config.get('PATHS','BACKUP_PATH')
 	log_path = config.get('PATHS','LOG_PATH')
 	call_transcode = 'true' == config.get('DECRYPT_BLURAY','CALL_TRANSCODE')
@@ -36,10 +35,12 @@ if is_admin():
 		
 		print('Finished backup')
 		transcode = 'python ' + os.path.join(os.path.dirname(os.path.abspath(__file__)), 'create-video-outputs.py -i ' + os.path.abspath(backup))
-		if call_transcode: os.system(transcode)
+		if call_transcode:
+			os.system(transcode)
+			
 	else:
 		print ('No disc found, is admin set properly, is there a disk, does the drive need opening and closing (sometimes helps)')
-		print ('existinmg in 10')
+		print ('existing in 10')
 		time.sleep(10)
 else:
 	# Re-run the program with admin rights

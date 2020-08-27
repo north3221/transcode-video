@@ -7,8 +7,9 @@ __pycache__/
 logs/
 output/
 backup/
-sandbox/
+.sandbox/
 temp/
+secret/
 
 # C extensions
 *.so

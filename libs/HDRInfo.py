@@ -1,5 +1,4 @@
 
-
 class HDRInfo:
 
 	def __init__(self, info):
