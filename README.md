@@ -43,15 +43,15 @@ This holds the settings
 This is the python script that transcodes the video
 
 #### usage:
-	`create-video-outputs.py -i[--input] <inputfile> -s[--sample] (optional)`
+	create-video-outputs.py -i[--input] <inputfile> -s[--sample] (optional)
 	NB sample time is a setting in config.ini
 	
 ### decrypt-bluray.py
 This is the python script that uses MakeMKV to decrypt a bluray in a drive
-Has an option in config.ini ['CALL_TRANSCODE'] which auto calls the transcode job once dycrypted if set to true
+Has an option in config.ini `CALL_TRANSCODE` which auto calls the transcode job once dycrypted if set to true
 
 ### The Movie Database
-There is an option in the config.ini ['CALL_MOVIEDB'] to make a call to The Movie Database to get the movie info
+There is an option in the config.ini `CALL_MOVIEDB` to make a call to The Movie Database to get the movie info
 It gets info and overwrites title and year on the info. Don't forget the pre-requisite to set api-key
 
 
