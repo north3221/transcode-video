@@ -10,6 +10,7 @@ backup/
 .sandbox/
 temp/
 secret/
+.vscode/
 
 # C extensions
 *.so
