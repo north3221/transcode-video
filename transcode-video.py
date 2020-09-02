@@ -46,7 +46,7 @@ def __loadVideoInput(inputfile):
 	videoInput = vinput(inputfile)
 	
 def __runTranscode():
-	# Idealy find a way to pass StingIO file direct to ffmpeg...? but for now
+	# Ideally find a way to pass StingIO file direct to ffmpeg...? but for now
 	global metadata 
 	metadata = path.join(temp_path, videoInput.title + '.met')
 	with open(metadata, 'w') as met:

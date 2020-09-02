@@ -29,6 +29,7 @@ NB if decrypting yourself or using already decrypted output, is not needed
 Required to be on your PATH
 
 Download from 				http://www.makemkv.com/download/
+Beta license to try 		https://www.makemkv.com/forum/viewtopic.php?t=1053
 
 #### mediainfo
 (also on PATH)

@@ -22,26 +22,26 @@ class videoInput:
 		self.playlistpath = None
 		self.input = None
 		self.year = datetime.datetime.now().year
-				
+		self.path = im.checkDir(osp.abspath(input))		
 		if self.__isBlurayFolder(input):
 			self.type = im.inputType.blurayBackup
 			self.folder = osp.basename(input)
 			self.__setPlaylist()
+			self.atmos = atmos(self.playlistpath)
 		elif osp.isfile(input):
 			self.type = im.inputType.videoFile
 			self.folder = osp.basename(osp.abspath((osp.join(input, os.pardir, os.pardir,os.pardir))))
+			self.atmos = atmos(input)
 		else:
 			print('You dont seem to have provided an bluray folder path, please check (', input , ')')
 			exit(2)
-		
-		self.path = im.checkDir(osp.abspath(input))
 		
 		self.__setTitle()
 		self.input = im.getFfmpegInput(self.type, self.path)
 		self.info = vi(self.input)
 		self.uhd = self.info.height == '2160'
 		self.hdr = hdr(self.info)
-		self.atmos = atmos(self.path)
+		
 		if checkMovieDB: self.__getMovieDBInfo()
 		self.__userInput()
 	
