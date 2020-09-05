@@ -61,7 +61,8 @@ class videoInput:
 		self.title = self.folder.replace("_"," ").title()				
 			
 	def __isBlurayFolder(self, path):
-		return osp.exists(path + "\BDMV\index.bdmv")
+		path = path.strip('"') + '\BDMV\index.bdmv'
+		return osp.exists(path)
 		
 	def __setPlaylist(self):
 		cmdFfmpeg = 'ffmpeg -i bluray:{blurayFolder}'.format(blurayFolder=self.path)
@@ -74,7 +75,7 @@ class videoInput:
 			if "selected" in line:
 				splitline = line.split()
 				self.playlist = splitline[splitline.index("selected") + 1]
-				if osp.isfile(self.path + '\BDMV\PLAYLIST\\' + self.playlist): self.playlistpath = self.path + '\BDMV\PLAYLIST\\' + self.playlist
+				if osp.isfile(self.path.strip('"') + '\BDMV\PLAYLIST\\' + self.playlist): self.playlistpath = self.path + '\BDMV\PLAYLIST\\' + self.playlist
 		
 	def __userInput(self):
 		indent = '\t'

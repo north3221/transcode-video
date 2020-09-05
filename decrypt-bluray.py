@@ -9,9 +9,11 @@ def is_admin():
 if is_admin():
 	print('Checking for disk info')
 	config = configparser.ConfigParser()
-	config.read('config/config.ini')
+	base_path = os.path.dirname(os.path.abspath(__file__))
+	config_path = os.path.realpath(os.path.join(base_path,'config/config.ini'))
+	config.read(config_path)
 	backup_path = config.get('PATHS','BACKUP_PATH')
-	log_path = config.get('PATHS','LOG_PATH')
+	log_path = os.path.realpath(os.path.join(base_path,config.get('PATHS','LOG_PATH')))
 	call_transcode = 'true' == config.get('DECRYPT_BLURAY','CALL_TRANSCODE')
 	cmd = 'makemkvcon -r info'
 	try:
@@ -25,7 +27,7 @@ if is_admin():
 			drive = line.split(',')[6]
 	if len(title) > 1:
 		# TODO likely going to cause an issue if any spaces in path or title
-		backup = os.path.join(backup_path, title)
+		backup = '"' + os.path.realpath(os.path.join(base_path,backup_path, title)) + '"'
 		log = os.path.join(log_path, 'makemkv-' + title +'.log')
 		bcmd = 'makemkvcon backup --decrypt --cache=256 -r --progress=-same disc:' + disk + ' ' + backup
 		print('Running Bluray decrypt, check log for details:=', log)
@@ -34,7 +36,7 @@ if is_admin():
 			subprocess.call(bcmd, stderr=subprocess.STDOUT, stdout=log_file)
 		
 		print('Finished backup')
-		transcode = 'python ' + os.path.join(os.path.dirname(os.path.abspath(__file__)), 'create-video-outputs.py -i ' + os.path.abspath(backup))
+		transcode = 'python ' + os.path.realpath(os.path.join(base_path, 'transcode-video.py')) + ' -i ' + backup
 		if call_transcode:
 			os.system(transcode)
 			

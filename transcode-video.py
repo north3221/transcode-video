@@ -4,7 +4,7 @@ from libs.videoInput import videoInput as vinput
 from os import path
 ############### CONFIG ##########################
 config = configparser.ConfigParser()
-config.read('config/config.ini')
+config.read(os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'config/config.ini')))
 opts = {}
 for section in config.sections():
 	for key, val in config.items(section):
@@ -56,7 +56,7 @@ def __runTranscode():
 		print (cmd, file=log_file)
 	print ('Running transcode job')
 	with open(log_path + videoInput.ofilename + '.transcode.log', 'w') as log_file:
-		subprocess.call(cmd, stderr=subprocess.STDOUT, stdout=log_file)
+		subprocess.call(cmd, stderr=subprocess.STDOUT, stdout=log_file, shell=True)
 	print('Process complete')
 	shutil.rmtree(temp_path)
 
@@ -74,7 +74,7 @@ def __baseFFMPEGcmd():
 	cmd.append('-probesize ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-analyzeduration ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
-	# Seems to be an issue having metadata as second input, seeems to only work on first?
+	# Seems to be an issue having metadata as second input, seems to only work on first?
 	cmd.append('-i "' + metadata + '"')
 	if sample: cmd.append(opts['sample_time'])
 	cmd.append('-i ' + videoInput.input)
