@@ -36,8 +36,9 @@ if is_admin():
 			subprocess.call(bcmd, stderr=subprocess.STDOUT, stdout=log_file)
 		
 		print('Finished backup')
-		transcode = 'python ' + os.path.realpath(os.path.join(base_path, 'transcode-video.py')) + ' -i ' + backup
 		if call_transcode:
+			print ('Calling transcode')
+			transcode = 'python ' + os.path.realpath(os.path.join(base_path, 'transcode-video.py')) + ' -i ' + backup
 			os.system(transcode)
 			
 	else:
