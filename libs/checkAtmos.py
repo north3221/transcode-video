@@ -17,7 +17,9 @@ class AtmosInfo:
 			exit()
 		output = output.decode("utf-8")
 		self.exists = 'Atmos' in output
-		if self.exists: self.stream = [i for i, s in enumerate(output.split('/')) if 'Atmos' in s][0]
+		if self.exists: 
+			print('Atmos found, setting stream info.....')
+			self.stream = [i for i, s in enumerate(output.split('/')) if 'Atmos' in s][0]
 			
 		
 		

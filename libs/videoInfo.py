@@ -3,7 +3,7 @@ import subprocess, io
 class videoInfo:
 
 	def __init__(self, input):
-		print('Analyzing video..')
+		print('Analyzing video......')
 		self.vstream = 'v:0'
 		self.astream = 'a:0'
 		self.__initInfo(input)

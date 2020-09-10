@@ -10,10 +10,13 @@ class videoInput:
 	
 	def __init__(self, input):
 		config = configparser.ConfigParser()
-		config.read('config/config.ini')
+		config.read(osp.realpath(osp.join(osp.dirname(osp.abspath(__file__)),'../config/config.ini')))
 		checkMovieDB = config.getboolean('MOVIEDB','CALL_MOVIEDB')
+		self.__x264_override = config.getboolean('MOVIEDB','X264_TUNE_OVERRIDE')
 		self.__userCheck = config.getboolean('USER_OPTION','USER_CHECK')
-		print('Getting video input data')
+		self.x264_tune = config.get('HD_OPTIONAL','X264_TUNE')
+		
+		print('Getting video input data..')
 		self.type = None
 		self.path = None
 		self.folder = None
@@ -89,6 +92,7 @@ class videoInput:
 		print(indent,'UHD:=', indent, indent, indent,self.uhd)
 		print(indent,'HDR:=', indent, indent, indent,self.hdr.exists, '(NB Cannot be changed)')
 		print(indent,'Atmos:=', indent, indent,self.atmos.exists, '(NB Cannot be changed)')
+		print(indent,'x264 Tune:=', indent, indent,self.x264_tune, '(NB Cannot be changed)')
 		print (boarder)
 		if self.__userCheck:
 			user_input = input('If you would like to change any of the above, type anything and will step through, if happy just hit enter\n')
@@ -124,15 +128,14 @@ class videoInput:
 			print('You entered and invalid year (', input_year, ') so leaving as was (', self.year,')')
 			
 	def __getMovieDBInfo(self):
-		print('Checking Movie DB for info')
 		try:
 			moviedb = mdb(self.title)
 			if moviedb.title == None:
 				print('No Movie DB info found, leaving as set by path detection')
 			else:
-				print('Info found from Movie DB')
 				self.title = moviedb.title
 				self.year = moviedb.release_date[:4]
+				if self.__x264_override and not moviedb.x264_tune == None: self.x264_tune = moviedb.x264_tune
 		except:
 			print('Issue getting info from MovieDB, leaving as set by path detection')
 		

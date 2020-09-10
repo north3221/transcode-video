@@ -14,6 +14,7 @@ for section in config.sections():
 			exec('opts["' + key + '"] = "' + val + '"')	
 			# Try bolean
 			if val.lower() in ('true', 'false'): exec('opts["' + key + '"] = ' + val.title())
+
 output_path = fi.checkDir(opts['output_path'])
 log_path = fi.checkDir(opts['log_path'])
 temp_path = fi.checkDir(opts['temp_path'])
@@ -73,10 +74,10 @@ def __baseFFMPEGcmd():
 	cmd.append('-loglevel ' + opts['ffmpeg_loglevel'])
 	cmd.append('-probesize ' + opts['ffmpeg_prob_anal'])
 	cmd.append('-analyzeduration ' + opts['ffmpeg_prob_anal'])
-	cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
 	# Seems to be an issue having metadata as second input, seems to only work on first?
 	cmd.append('-i "' + metadata + '"')
 	if sample: cmd.append(opts['sample_time'])
+	cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
 	cmd.append('-i ' + videoInput.input)
 	
 	return ' '.join(cmd)
@@ -91,7 +92,7 @@ def __hdFFMPEGcmd():
 		cmd.append('-maxrate ' + str(opts['hd_maxrate']) + 'k')
 		cmd.append('-bufsize ' + str(opts['hd_maxrate']*3) + 'k')
 	cmd.append('-preset ' + opts['hd_preset'])
-	if not opts['x264_tune'] == '': cmd.append('-tune ' + opts['x264_tune'])
+	if not videoInput.x264_tune == '': cmd.append('-tune ' + videoInput.x264_tune)
 	cmd.append('-s ' + opts['hd_size'])
 	cmd.append('-pix_fmt ' + opts['hd_pix_fmt'])
 	
@@ -126,14 +127,15 @@ def __uhdFFMPEGcmd():
 		params = params + ':vbv-bufsize=' + str(opts['uhd_maxrate']*3)
 	if videoInput.hdr.exists: params = params + ':' + videoInput.hdr.params
 	cmd.append(params)
-	aos = '0'
-	if videoInput.atmos.exists:
-		cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['uhd_acodec'] + ' -b:a:' + aos + ' 640k') 
-		cmd.append('-metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
-		aos = '1'
-	# copy audio, either its not atmos and just a straight copy to be the audio stream or it is Atmos so this is copying atmos to second stream
-	cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
-	if videoInput.atmos.exists: cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
+	# Add audio based on user codec choice
+	cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:0 ' + opts['uhd_acodec'] + ' -b:a:0 640k') 
+	cmd.append('-metadata:s:a:0 title="Surround 5.1" -metadata:s:a:0 handler="Surround 5.1"')
+	
+	# If copy atmos is set by user and atmos exists copy it
+	if videoInput.atmos.exists and opts['uhd_copy_atmos']:
+		cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:1 copy -max_muxing_queue_size 4096')
+		cmd.append('-metadata:s:a:1 title="Dolby Atmos" -metadata:s:a:1 handler="Dolby Atmos"')
+	
 	cmd.append('-metadata:s:a language=eng')
 	cmd.append('-metadata title="' + videoInput.title + '" -metadata year="' + str(videoInput.year) + '"')
 	
