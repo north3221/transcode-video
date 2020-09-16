@@ -21,8 +21,8 @@ class movieDB:
 
 		self.__url = url + 'api_key=' + api_key
 
-	def __getMovieDBresponse(self):
-		query_url = '&query=' + '+'.join(self.__search)
+	def __getMovieDBresponse(self, search):
+		query_url = '&query=' + '+'.join(search)
 		req = r.Request(self.__url + query_url)
 		try:
 			response = r.urlopen(req)
@@ -35,12 +35,18 @@ class movieDB:
 
 	def __getInfo(self):
 		self.__setrequest()
-		self.__getMovieDBresponse()
+		self.__getMovieDBresponse(self.__search)
 		# Blurays sometimes have movie studio etc at the beginning of the name so if nothing found pop them out until down to one word
-		while len(self.__result) == 0 and len(self.__search) > 1:
-			self.__search.pop(0)
-			self.__getMovieDBresponse()
-			
+		search = self.__search[:]
+		while len(self.__result) == 0 and len(search) > 1:
+			search.pop(0)
+			self.__getMovieDBresponse(search)
+		# Try the other way round as some have info on the end of the bluray name
+		search = self.__search[:]
+		while len(self.__result) == 0 and len(search) > 1:
+			search.pop()
+			self.__getMovieDBresponse(search)
+		
 	def __setInfo(self):
 		self.__getInfo()
 		if len(self.__result) > 0:

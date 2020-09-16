@@ -131,7 +131,8 @@ class videoInput:
 		try:
 			moviedb = mdb(self.title)
 			if moviedb.title == None:
-				print('No Movie DB info found, leaving as set by path detection')
+				print('No Movie DB info found, leaving as set by path detection and ensuring user validation')
+				self.__userCheck = True
 			else:
 				self.title = moviedb.title
 				self.year = moviedb.release_date[:4]
