@@ -8,7 +8,7 @@ class AtmosInfo:
 			
 	def __setAtmos(self, mi):
 		delim = '/'
-		cmdMediaIffo = 'mediainfo --Inform="Audio;%Format_Commercial_IfAny%' + delim + '" ' + mi
+		cmdMediaIffo = 'mediainfo --Inform="Audio;%Format_Commercial_IfAny%' + delim + '" "' + mi + '"'
 		try:
 			output = subprocess.check_output(cmdMediaIffo, stderr=subprocess.STDOUT)
 		except Exception as e:			

@@ -43,7 +43,7 @@ if is_admin():
 			
 	else:
 		print ('No disc found, is admin set properly, is there a disk, does the drive need opening and closing (sometimes helps)')
-		print ('existing in 10')
+		print ('exiting in 10')
 		time.sleep(10)
 else:
 	# Re-run the program with admin rights
