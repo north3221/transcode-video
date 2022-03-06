@@ -1,4 +1,4 @@
-import os, subprocess
+import os, subprocess, shutil
     
 def getFileList(inDirectory, extensions=[''], fileList=[]):
     for entry in os.listdir(inDirectory):
@@ -39,3 +39,4 @@ def checkDir(dirtocheck):
             print (dir)
             exit(2)
     return os.path.abspath(dirtocheck) + os.sep
+    

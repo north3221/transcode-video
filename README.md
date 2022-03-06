@@ -10,7 +10,7 @@ This comes with the option to pass the backed-up bluray directly to the transcod
 
 You can also choose to bypass the user check of movie info (so you can overwrite title, year etc), so it can just do the lot in one go.
 If doing that I suggest using the MovieDB option and setting a api-key so it tries to get the right title and year.
-Then also set the 'USER_CHECK_CONFIDENCE' so that i twill still check with you if it cant find a great match
+Then also set the 'USER_CHECK_CONFIDENCE' so that it will still check with you if it cant find a great match
 
 There are win bat files in the windows folder, so if you set movie db, and no user check you can put a bluray in and just double click:	`run-bluray-decrypt.bat`
 

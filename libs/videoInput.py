@@ -1,23 +1,24 @@
 import subprocess, datetime, os, configparser
 import os.path as osp
-from libs import inputManager as im
-from libs.videoInfo import videoInfo as vi
-from libs.HDRInfo import HDRInfo as hdr
-from libs.checkAtmos import AtmosInfo as atmos
-from libs.moviedb import movieDB as mdb
+try:
+    from libs import inputManager as im
+    from libs.videoInfo import videoInfo as vi
+    from libs.HDRInfo import HDRInfo as hdr
+    from libs.checkAtmos import AtmosInfo as atmos
+    from libs.moviedb import movieDB as mdb
+except ImportError:
+    import inputManager as im
+    from videoInfo import videoInfo as vi
+    from HDRInfo import HDRInfo as hdr
+    from checkAtmos import AtmosInfo as atmos
+    from moviedb import movieDB as mdb
+    
 
 class videoInput:
     
     def __init__(self, input):
-        config = configparser.ConfigParser()
-        config.read(osp.realpath(osp.join(osp.dirname(osp.abspath(__file__)),'../config/config.ini')))
-        checkMovieDB = config.getboolean('MOVIEDB','CALL_MOVIEDB')
-        self.__x264_override = config.getboolean('MOVIEDB','X264_TUNE_OVERRIDE')
-        self.__userCheck = config.getboolean('USER_OPTION','USER_CHECK')
-        self.__userCheckConf = config.getint('USER_OPTION','USER_CHECK_CONFIDENCE')
-        self.x264_tune = config.get('HD_OPTIONAL','X264_TUNE')
-        
         print('Getting video input data..')
+        self.__initVars()
         self.type = None
         self.path = None
         self.folder = None
@@ -46,8 +47,17 @@ class videoInput:
         self.uhd = self.info.height == '2160'
         self.hdr = hdr(self.info)
         
-        if checkMovieDB: self.__getMovieDBInfo()
+        if self.__checkMovieDB: self.__getMovieDBInfo(self.title)
         self.__userInput()
+        
+    def __initVars(self):
+        config = configparser.ConfigParser()
+        config.read(osp.realpath(osp.join(osp.dirname(osp.abspath(__file__)),'../config/config.ini')))
+        self.__checkMovieDB = config.getboolean('MOVIEDB','CALL_MOVIEDB')
+        self.__x264_override = config.getboolean('MOVIEDB','X264_TUNE_OVERRIDE')
+        self.__userCheck = config.getboolean('USER_OPTION','USER_CHECK')
+        self.__userCheckConf = config.getint('USER_OPTION','USER_CHECK_CONFIDENCE')
+        self.x264_tune = config.get('HD_OPTIONAL','X264_TUNE')
     
     @property
     def title(self):
@@ -83,10 +93,33 @@ class videoInput:
                 if osp.isfile(pl_check): self.playlistpath = pl_check
         
     def __userInput(self):
+        self.__printInfo()
+        if self.__userCheck:
+            user_input = input('If you would like to change any of the above, type anything and will step through, if happy just hit enter\n')
+            if not user_input == '':
+                os.system('cls') if os.name == 'nt' else os.system('clear')
+                self.__printInfo('Updated based on your inputs, now set to')
+                input_search = input('Input new Movie DB Search or hit enter to input manually\n')
+                if input_search == '': 
+                    input_title = input('Input Title or hit enter to leave as "' + self.title + '"\n')
+                    if not input_title == '': self.title = input_title
+                    self.__inputYear()
+                    input_vs = input('Input Video Stream or hit enter to leave as "' + self.info.vstream + '"\n')
+                    if not input_vs == '': self.info.vstream = input_vs
+                    input_as = input('Input Audio Stream or hit enter to leave as "' + self.info.astream + '"\n')
+                    if not input_as == '': self.info.astream =input_as
+                    input_uhd = input('Input UHD or hit enter to leave as "' + str(self.uhd) + '"\n')
+                    if input_uhd.lower() in ['true', 'false']: self.uhd = input_uhd.lower() == 'true'
+                else:
+                    self.__getMovieDBInfo(input_search, True)
+                    self.__userInput()
+                    
+    
+    def __printInfo(self, header='Please check these details are correct'):
         indent = '\t'
         boarder = '******************************************************'
         print (boarder)
-        print('Please check these details are correct:')
+        print(header, ':')
         print(indent,'Title:=', indent, indent, self.title)
         print(indent,'Year:=', indent, indent, self.year)
         print(indent,'Video Stream:=', indent, self.info.vstream)
@@ -96,32 +129,8 @@ class videoInput:
         print(indent,'Atmos:=', indent, indent,self.atmos.exists, '(NB Cannot be changed)')
         print(indent,'x264 Tune:=', indent, indent,self.x264_tune, '(NB Cannot be changed)')
         print (boarder)
-        if self.__userCheck:
-            user_input = input('If you would like to change any of the above, type anything and will step through, if happy just hit enter\n')
-            if not user_input == '':
-                input_title = input('Input Title or hit enter to leave as "' + self.title + '"\n')
-                if not input_title == '': self.title = input_title
-                self.__inputYear()
-                input_vs = input('Input Video Stream or hit enter to leave as "' + self.info.vstream + '"\n')
-                if not input_vs == '': self.info.vstream = input_vs
-                input_as = input('Input Audio Stream or hit enter to leave as "' + self.info.astream + '"\n')
-                if not input_as == '': self.info.astream =input_as
-                input_uhd = input('Input UHD or hit enter to leave as "' + str(self.uhd) + '"\n')
-                if input_uhd.lower() in ['true', 'false']: self.uhd = input_uhd.lower() == 'true'
-                print(os.name)
-                os.system('cls') if os.name == 'nt' else os.system('clear')
-                boarder = '******************************************************'
-                print (boarder)
-                print('Updated based on your inputs, now set to:')
-                print(indent,'Title:=', indent, indent, self.title)
-                print(indent,'Year:=', indent, indent, self.year)
-                print(indent,'Video Stream:=', indent, self.info.vstream)
-                print(indent,'Audio Stream:=', indent, self.info.astream)
-                print(indent,'UHD:=', indent, indent, indent,self.uhd)
-                print(indent,'HDR:=', indent, indent, indent,self.hdr.exists)
-                print(indent,'Atmos:=', indent, indent,self.atmos.exists)
-                print (boarder)
-        
+
+    
     def __inputYear(self):
         try:
             input_year = input('Input Year or hit enter to leave as "' + str(self.year) + '"\n')
@@ -129,9 +138,9 @@ class videoInput:
         except ValueError:
             print('You entered and invalid year (', input_year, ') so leaving as was (', self.year,')')
             
-    def __getMovieDBInfo(self):
+    def __getMovieDBInfo(self, search, self_check=False):
         try:
-            moviedb = mdb(self.title)
+            moviedb = mdb(search, self_check)
             if moviedb.title == None:
                 print('No Movie DB info found, leaving as set by path detection and ensuring user validation if user confidence not zero')
                 if self.__userCheckConf > 0: self.__userCheck = True
@@ -140,7 +149,9 @@ class videoInput:
                 self.year = moviedb.release_date[:4]
                 if self.__x264_override and not moviedb.x264_tune == None: self.x264_tune = moviedb.x264_tune
                 if not self.__userCheck and moviedb.match <= self.__userCheckConf: self.__userCheck = True
+                self.mdb = moviedb
         except:
-            print('Issue getting info from MovieDB, leaving as set by path detection')
+            print('Issue getting info from MovieDB, leaving as set by path detection and ensuring user validation if user confidence not zero')
+            if self.__userCheckConf > 0: self.__userCheck = True
         
 
