@@ -14,6 +14,10 @@ Then also set the 'USER_CHECK_CONFIDENCE' so that it will still check with you i
 
 If it doesnt match ans askes you, now you can input a new search for moviedb, it will return a list of all found on moviedb and let you selct the correct title
 
+There is an option to backup subs. At the moment I cant get subs burnt on as part of the complex filtering. So it creates a backup file, with really
+low resolution to keep file size small. There is then a function to add subs, but right now needs an external program and manual intervention. You need
+to create the subs file using something like subedit, to convert the image subs to text, then this imports them to your video
+
 There are win bat files in the windows folder, so if you set movie db, and no user check you can put a bluray in and just double click:	`run-bluray-decrypt.bat`
 
 
