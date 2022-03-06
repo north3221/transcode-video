@@ -113,11 +113,11 @@ def __hdFFMPEGcmd():
             cmd.append('-filter_complex "[1:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
             aos = '1'
         else:
-            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['hd_acodec'] + ' -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
             aos = '1'
             cmd.append('-filter_complex "[1:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
     else:
-        cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' eac3 -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+        cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['hd_acodec'] + ' -b:a:' + aos + ' 640k -metadata:s:a:' + aos + ' title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
     cmd.append('-metadata:s:a language=eng')
     cmd.append('-metadata title="' + videoInput.title + '" -metadata date="' + str(videoInput.year) + '"')
     
@@ -141,14 +141,30 @@ def __uhdFFMPEGcmd():
         params = params + ':vbv-bufsize=' + str(opts['uhd_maxrate']*3)
     if videoInput.hdr.exists: params = params + ':' + videoInput.hdr.params
     cmd.append(params)
-    # Add audio based on user codec choice
-    cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:0 ' + opts['uhd_acodec'] + ' -b:a:0 640k') 
-    cmd.append('-metadata:s:a:0 title="Surround 5.1" -metadata:s:a:0 handler="Surround 5.1"')
-    
+    # Add audio based on user codec preferences
+    aos = '0'
     # If copy atmos is set by user and atmos exists copy it
     if videoInput.atmos.exists and opts['uhd_copy_atmos']:
-        cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:1 copy -max_muxing_queue_size 4096')
-        cmd.append('-metadata:s:a:1 title="Dolby Atmos" -metadata:s:a:1 handler="Dolby Atmos"')
+        if opts['uhd_atmos_primary']:
+            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
+            cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
+            aos = '1'
+            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['uhd_acodec'] + ' -b:a:0 640k') 
+            cmd.append('-metadata:s:a:0 title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+        else:
+            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' ' + opts['uhd_acodec'] + ' -b:a:0 640k') 
+            cmd.append('-metadata:s:a:0 title="Surround 5.1" -metadata:s:a:' + aos + ' handler="Surround 5.1"')
+            aos = '1'
+            cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
+            cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
+        aos = '2'
+    else:
+        cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
+        cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
+        aos = '1'    
+    
+    if opts['uhd_add_stereo']:
+        cmd.append('-filter_complex "[1:' + videoInput.info.astream + ']volume=2.5:precision=fixed[a]" -map [a] -c:a:' + aos + ' aac -b:a:' + aos + ' 320k -ac:a:' + aos + ' 2 -metadata:s:a:' + aos + ' title="Stereo" -metadata:s:a:' + aos + ' handler="Stereo"')
     
     cmd.append('-metadata:s:a language=eng')
     cmd.append('-metadata title="' + videoInput.title + '" -metadata year="' + str(videoInput.year) + '"')
