@@ -55,24 +55,27 @@ This is the python script that transcodes the video
 	NB sample time is a setting in config.ini
 	
 ### decrypt-bluray.py
-This is the python script that uses MakeMKV to decrypt a bluray in a drive
-Has an option in config.ini `CALL_TRANSCODE` which auto calls the transcode job once dycrypted if set to true
+This is the python script that uses MakeMKV to decrypt a bluray in a drive. It has an option in config.ini `CALL_TRANSCODE` which auto calls the 
+transcode job once dycrypted if set to true
 
 ### The Movie Database
-There is an option in the config.ini `CALL_MOVIEDB` to make a call to The Movie Database to get the movie info
-It gets info and overwrites title and year on the info. Don't forget the pre-requisite to set api-key
+There is an option in the config.ini `CALL_MOVIEDB` to make a call to The Movie Database to get the movie info. It gets info and overwrites title and 
+year on the info. Don't forget the pre-requisite to set api-key
 
-#### Window folder (with drag and drop):
+### Window folder (with drag and drop):
 There are three drag and drop (dnd) files.
-
 These two are so you can drag and drop your video file or bluray folder for full transcode or sample:
 *	`dnd-video-transcode.bat`	
 *	`dnd-video-transcode-sample.bat`
 
-Then this one is for addind a subs file (.srt) to your movie. So if you used backup subs option, there will be a file in your subs backup folder with all the sub streams.
-You need to convert the one you want to a text .set file and drag your video on here, it will ask you for .srt file loacation, or just leave it is sub backup folder and will pick up by default
-NB I use subtitle edit: https://github.com/SubtitleEdit/subtitleedit/releases
+Then this one is for adding a subs file (.srt) to your movie. So if you used backup subs option, there will be a file in your subs backup folder with all the sub streams.
+You need to convert the one you want to a text .srt file and drag your video on here, it will ask you for .srt file loacation, or just leave it in sub backup folder, 
+with the same name as your movie, and will pick up by default
+
 *	`dnd-import-subs.bat`
+
+NB I use subtitle edit: https://github.com/SubtitleEdit/subtitleedit/releases
+
 
 There is also a bat for running decrypt by double clicking
 So if set the call transcode to true, calling Movie DB and set check user to false can double click and it will run the lot
