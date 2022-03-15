@@ -22,32 +22,38 @@ class videoInput:
         self.type = None
         self.path = None
         self.folder = None
-        self.title = None
+        self.__title = None
         self.playlist = None
         self.playlistpath = None
         self.input = None
         self.year = datetime.datetime.now().year
         self.path = im.checkDir(osp.abspath(input))     
         if self.__isBlurayFolder(input):
+            print('Bluray folder found')
             self.type = im.inputType.blurayBackup
             self.folder = osp.basename(input)
             self.__setPlaylist()
             self.atmos = atmos(self.playlistpath)
-        elif osp.isfile(input):
+        elif self.__isBlurayFolder(osp.abspath((osp.join(input, os.pardir, os.pardir, os.pardir)))):
+            print('File within Bluray folder found')
             self.type = im.inputType.videoFile
-            self.folder = osp.basename(osp.abspath((osp.join(input, os.pardir, os.pardir,os.pardir))))
+            self.folder = osp.basename(osp.abspath((osp.join(input, os.pardir, os.pardir, os.pardir))))
+            self.atmos = atmos(input)
+        elif osp.isfile(input):
+            print('File found')
+            self.type = im.inputType.videoFile
+            self.folder = osp.basename(osp.abspath((osp.join(input, os.pardir))))
             self.atmos = atmos(input)
         else:
             print('You dont seem to have provided an bluray folder path, please check (', input , ')')
             exit(2)
-        
         self.__setTitle()
         self.input = im.getFfmpegInput(self.type, self.path)
         self.info = vi(self.input)
         self.uhd = self.info.height == '2160'
         self.hdr = hdr(self.info)
         
-        if self.__checkMovieDB: self.__getMovieDBInfo(self.title)
+        if self.__checkMovieDB: self.__getMovieDBInfo(self.__title)
         self.__userInput()
         
     def __initVars(self):
@@ -72,9 +78,9 @@ class videoInput:
         return self.__title + ' (' + str(self.year) + ')'
     
     def __setTitle(self):
-        self.title = self.folder.replace("_"," ").title()               
+        self.__title = self.folder.replace("_"," ").title()               
             
-    def __isBlurayFolder(self, path):
+    def __isBlurayFolder(self, path) -> bool:
         path = path.strip('"') + '\BDMV\index.bdmv'
         return osp.exists(path)
         
@@ -101,8 +107,8 @@ class videoInput:
                 self.__printInfo('Updated based on your inputs, now set to')
                 input_search = input('Input new Movie DB Search or hit enter to input manually\n')
                 if input_search == '': 
-                    input_title = input('Input Title or hit enter to leave as "' + self.title + '"\n')
-                    if not input_title == '': self.title = input_title
+                    input_title = input('Input Title or hit enter to leave as "' + self.__title + '"\n')
+                    if not input_title == '': self.__title = input_title
                     self.__inputYear()
                     input_vs = input('Input Video Stream or hit enter to leave as "' + self.info.vstream + '"\n')
                     if not input_vs == '': self.info.vstream = input_vs
@@ -120,7 +126,7 @@ class videoInput:
         boarder = '******************************************************'
         print (boarder)
         print(header, ':')
-        print(indent,'Title:=', indent, indent, self.title)
+        print(indent,'Title:=', indent, indent, self.__title)
         print(indent,'Year:=', indent, indent, self.year)
         print(indent,'Video Stream:=', indent, self.info.vstream)
         print(indent,'Audio Stream:=', indent, self.info.astream)
@@ -145,7 +151,7 @@ class videoInput:
                 print('No Movie DB info found, leaving as set by path detection and ensuring user validation if user confidence not zero')
                 if self.__userCheckConf > 0: self.__userCheck = True
             else:
-                self.title = moviedb.title
+                self.__title = moviedb.title
                 self.year = moviedb.release_date[:4]
                 if self.__x264_override and not moviedb.x264_tune == None: self.x264_tune = moviedb.x264_tune
                 if not self.__userCheck and moviedb.match <= self.__userCheckConf: self.__userCheck = True

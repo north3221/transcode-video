@@ -83,7 +83,7 @@ def __baseFFMPEGcmd():
     cmd.append('-i "' + metadata + '"')
     if sample: cmd.append(opts['sample_time'])
     cmd.append('-forced_subs_only ' + str(opts['ffmpeg_forced_subs_only']))
-    cmd.append('-hwaccel cuda')
+    cmd.append(opts['hw_accel'])
     cmd.append('-i ' + videoInput.input)
     
     return ' '.join(cmd)
@@ -143,8 +143,10 @@ def __uhdFFMPEGcmd():
     cmd.append(params)
     # Add audio based on user codec preferences
     aos = '0'
+    atmos_ext = ''
     # If copy atmos is set by user and atmos exists copy it
     if videoInput.atmos.exists and opts['uhd_copy_atmos']:
+        atmos_ext = 'Atmos.'
         if opts['uhd_atmos_primary']:
             cmd.append('-map 1:' + videoInput.info.astream + ' -c:a:' + aos + ' copy -max_muxing_queue_size 4096')
             cmd.append('-metadata:s:a:' + aos + ' title="Dolby Atmos" -metadata:s:a:' + aos + ' handler="Dolby Atmos"')
@@ -172,6 +174,7 @@ def __uhdFFMPEGcmd():
     global uhd_output
     uhd_output = output_path + videoInput.ofilename + '.UHD.'
     if videoInput.hdr.exists: uhd_output = uhd_output + 'HDR.'
+    uhd_output = uhd_output + atmos_ext
     if sample: uhd_output = uhd_output + 'sample.'
     uhd_output = uhd_output + opts['uhd_ext']
     cmd.append('"' + uhd_output  + '" -y')

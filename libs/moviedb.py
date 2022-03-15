@@ -3,7 +3,7 @@ import re, urllib.request as r, urllib.error as err, json, os.path as osp
 class movieDB:
 
     def __init__(self, title, user_check=False, dump=False):
-        print('Checking Movie DB for info..........')
+        print('Checking Movie DB for info for [' + title + ']..........')
         self.title = None
         self.match = 0
         self.__dump = dump
@@ -100,11 +100,14 @@ class movieDB:
         print('Movie info found...........')
 
         if user_check:
-            for i in range(0,self.result_count):
-                print(i, ':', self.__result[i]['title'], self.__result[i]['release_date'])
-            user_input = input('Please input the number of the correct movie db result: ')
+            movie_idx = 0
+            if self.result_count > 1:
+                print('Multiple movies found..')
+                for i in range(0,self.result_count):
+                    print(i, ':', self.__result[i]['title'], self.__result[i]['release_date'])
+                movie_idx = int(input('Please input the number of the correct movie db result: '))             
             try:
-                self.__setKeys(self.__result[int(user_input)])
+                self.__setKeys(self.__result[movie_idx])
             except:
                 pass
         else:  
