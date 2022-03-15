@@ -68,13 +68,16 @@ There are three drag and drop (dnd) files.
 These two are so you can drag and drop your video file or bluray folder for full transcode or sample:
 *	`dnd-video-transcode.bat`	
 *	`dnd-video-transcode-sample.bat`
-This one is for addind a subs file (.srt) to your movie. So if you used backup subs option, there will be a file in your subs backup folder with all the sub streams.
+
+Then this one is for addind a subs file (.srt) to your movie. So if you used backup subs option, there will be a file in your subs backup folder with all the sub streams.
 You need to convert the one you want to a text .set file and drag your video on here, it will ask you for .srt file loacation, or just leave it is sub backup folder and will pick up by default
 NB I use subtitle edit: https://github.com/SubtitleEdit/subtitleedit/releases
 *	`dnd-import-subs.bat`
+
 There is also a bat for running decrypt by double clicking
 So if set the call transcode to true, calling Movie DB and set check user to false can double click and it will run the lot
 *	`run-bluray-decrypt.bat`
+TODO work out how to trigger this when a disc is inserted
 
 
 
